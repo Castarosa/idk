@@ -1,0 +1,27 @@
+import smtplib
+from email.message import EmailMessage
+
+# Вказуємо ім'я файлу
+textfile = "textfile.txt"
+
+# Відкриваємо файл і читаємо його вміст
+with open(textfile, "r", encoding="utf-8") as fp:
+    msg = EmailMessage()
+    msg.set_content(fp.read())
+
+# Налаштовуємо параметри електронного листа
+msg['Subject'] = f'The contents of {textfile}'
+msg['From'] = "sasha.kapij@gmail.com"
+msg['To'] = "sasha.kapij2@gmail.com"
+
+# Налаштовуємо підключення до SMTP-сервера Gmail
+smtp_server = "smtp.gmail.com"
+smtp_port = 587
+username = "sasha.kapij@gmail.com"
+password = " "  # Використовуйте пароль додатку, а не основний пароль
+
+# Відправка листа
+with smtplib.SMTP(smtp_server, smtp_port) as s:
+    s.starttls()  # Використовуємо захищене з'єднання
+    s.login(username, password)
+    s.send_message(msg)
