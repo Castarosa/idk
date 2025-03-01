@@ -1,27 +1,45 @@
 import smtplib
+import os
 from email.message import EmailMessage
+from dotenv import load_dotenv  # Бібліотека для роботи з .env файлами
 
-# Вказуємо ім'я файлу
+# Завантажуємо змінні середовища з .env
+load_dotenv()
+
+# Отримуємо дані з .env
+username = os.getenv("EMAIL_USER")
+password = os.getenv("EMAIL_PASS")
+
+# Вказуємо файл, який хочемо відправити
 textfile = "textfile.txt"
 
-# Відкриваємо файл і читаємо його вміст
-with open(textfile, "r", encoding="utf-8") as fp:
-    msg = EmailMessage()
-    msg.set_content(fp.read())
+# Відкриваємо файл та читаємо його вміст
+try:
+    with open(textfile, "r", encoding="utf-8") as fp:
+        file_content = fp.read()
+except FileNotFoundError:
+    print(f"Помилка: Файл '{textfile}' не знайдено.")
+    exit(1)
 
-# Налаштовуємо параметри електронного листа
+# Формуємо електронний лист
+msg = EmailMessage()
+msg.set_content(file_content)
 msg['Subject'] = f'The contents of {textfile}'
-msg['From'] = "sasha.kapij@gmail.com"
-msg['To'] = "sasha.kapij2@gmail.com"
+msg['From'] = username
+msg['To'] = "sasha.kapij@gmail.com"  # Отримувач
 
-# Налаштовуємо підключення до SMTP-сервера Gmail
+# Відправка листа через SMTP сервер Gmail
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
-username = "sasha.kapij@gmail.com"
-password = " "  # Використовуйте пароль додатку, а не основний пароль
 
-# Відправка листа
-with smtplib.SMTP(smtp_server, smtp_port) as s:
-    s.starttls()  # Використовуємо захищене з'єднання
-    s.login(username, password)
-    s.send_message(msg)
+try:
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()  # Використовуємо захищене з'єднання
+        server.login(username, password)
+        server.send_message(msg)
+    print("Лист успішно надіслано!")
+except Exception as e:
+    print(f"Помилка при відправці листа: {e}")
+
+# Додатковий вивід вмісту файлу у консоль (для перевірки)
+print(file_content)
