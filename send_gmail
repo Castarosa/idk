@@ -1,45 +1,45 @@
 import smtplib
 import os
 from email.message import EmailMessage
-from dotenv import load_dotenv  # Бібліотека для роботи з .env файлами
+from dotenv import load_dotenv  # Library for working with .env files
 
-# Завантажуємо змінні середовища з .env
+# Load environment variables from .env
 load_dotenv()
 
-# Отримуємо дані з .env
+# Get credentials from .env
 username = os.getenv("EMAIL_USER")
 password = os.getenv("EMAIL_PASS")
 
-# Вказуємо файл, який хочемо відправити
+# Specify the file to be sent
 textfile = "textfile.txt"
 
-# Відкриваємо файл та читаємо його вміст
+# Open the file and read its contents
 try:
     with open(textfile, "r", encoding="utf-8") as fp:
         file_content = fp.read()
 except FileNotFoundError:
-    print(f"Помилка: Файл '{textfile}' не знайдено.")
+    print(f"Error: File '{textfile}' not found.")
     exit(1)
 
-# Формуємо електронний лист
+# Compose the email
 msg = EmailMessage()
 msg.set_content(file_content)
 msg['Subject'] = f'The contents of {textfile}'
 msg['From'] = username
-msg['To'] = "sasha.kapij@gmail.com"  # Отримувач
+msg['To'] = "sasha.kapij@gmail.com"  # Recipient
 
-# Відправка листа через SMTP сервер Gmail
+# Send the email using Gmail's SMTP server
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
 
 try:
     with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()  # Використовуємо захищене з'єднання
+        server.starttls()  # Use secure connection
         server.login(username, password)
         server.send_message(msg)
-    print("Лист успішно надіслано!")
+    print("Email sent successfully!")
 except Exception as e:
-    print(f"Помилка при відправці листа: {e}")
+    print(f"Error while sending email: {e}")
 
-# Додатковий вивід вмісту файлу у консоль (для перевірки)
+# Additional output of the file content to console (for verification)
 print(file_content)
